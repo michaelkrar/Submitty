@@ -120,7 +120,7 @@ def parse_datetime(date_string):
         pass
 
     try:
-        datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S').replace(tzinfo = get_timezone())
+        return datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S').replace(tzinfo = get_timezone())
         return
     except ValueError:
         pass
