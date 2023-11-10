@@ -178,6 +178,9 @@ class TestDateUtils(TestCase):
 
         for testcase in testcases:
             with self.subTest(str(testcase[0])):
+                print(testcase[1].timetuple())
+                print( (dateutils.parse_datetime(testcase[0])).timetuple())
+                print("======================================================")
                 self.assertEqual(
                     testcase[1],
                     dateutils.parse_datetime(testcase[0])
