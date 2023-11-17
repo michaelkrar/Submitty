@@ -1,7 +1,7 @@
+import pytz
 import re
 import tzlocal
 from datetime import datetime, timedelta
-
 
 def get_timezone():
     """
@@ -11,9 +11,7 @@ def get_timezone():
     :return:
     :rtype: pytz.tzinfo.DstTzInfo
     """
-    # noinspection PyUnresolvedReferences
-    return tzlocal.get_localzone()
-
+    return pytz.timezone('America/New_York')  # Change 'America/New_York' to your local timezone
 
 def get_current_time():
     """
@@ -21,7 +19,6 @@ def get_current_time():
     :return:
     """
     return datetime.now(get_timezone())
-
 
 def write_submitty_date(d=None, milliseconds=False):
     """
@@ -39,7 +36,7 @@ def write_submitty_date(d=None, milliseconds=False):
             f"Invalid type. Expected datetime or datetime string, got {type(d)}."
         )
     if d.tzinfo is None:
-        d = get_timezone().localize(d)
+        d = d.replace(tzinfo=get_timezone())
 
     if milliseconds:
         mlsec = d.strftime("%f")[0:3]
@@ -47,7 +44,6 @@ def write_submitty_date(d=None, milliseconds=False):
     else:
         answer = d.strftime("%Y-%m-%d %H:%M:%S%z")
     return answer
-
 
 def read_submitty_date(s):
     """
@@ -69,7 +65,7 @@ def read_submitty_date(s):
             # hoping to find no timezone
             without_timezone = datetime.strptime(thedatetime, '%Y-%m-%d %H:%M:%S')
             my_timezone = get_timezone()
-            with_timezone = my_timezone.localize(without_timezone)
+            with_timezone = without_timezone.replace(tzinfo=my_timezone)
         except ValueError:
             try:
                 # hoping to find timezone -04
@@ -80,7 +76,6 @@ def read_submitty_date(s):
                 print("DATE PROBLEM", s)
                 raise SystemExit("ERROR:  invalid date format %s" % s)
     return with_timezone
-
 
 def parse_datetime(date_string):
     """
@@ -108,7 +103,7 @@ def parse_datetime(date_string):
         my_timezone = date_string.tzinfo
         if my_timezone is None:
             my_timezone = get_timezone()
-            date_string = my_timezone.localize(date_string)
+            date_string = date_string.replace(tzinfo=my_timezone)
 
         return date_string
     elif not isinstance(date_string, str):
@@ -120,18 +115,17 @@ def parse_datetime(date_string):
         pass
 
     try:
-        return datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S').replace(tzinfo = get_timezone())
+        return datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S').replace(tzinfo=get_timezone())
 
-        return
     except ValueError:
         pass
 
     try:
         return datetime.strptime(date_string, '%Y-%m-%d').replace(
-                hour=23,
-                minute=59,
-                second=59,
-            ).replace(tzinfo = get_timezone())
+            hour=23,
+            minute=59,
+            second=59,
+        ).replace(tzinfo=get_timezone())
 
     except ValueError:
         pass
@@ -163,7 +157,6 @@ def parse_datetime(date_string):
         ) + timedelta(days=days)
 
     raise ValueError("Invalid string for date parsing: " + str(date_string))
-
 
 def get_current_semester() -> str:
     """
