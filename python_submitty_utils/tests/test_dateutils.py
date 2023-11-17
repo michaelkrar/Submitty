@@ -10,9 +10,9 @@ from submitty_utils import dateutils
 class TestDateUtils(TestCase):
     @patch(
         "submitty_utils.dateutils.get_current_time",
-        return_value=pytz_timezone('America/New_York').localize(datetime(
-            2016, 10, 14, 22, 11, 32, 0
-        ))
+        return_value=datetime(
+            2016, 10, 14, 22, 11, 32, 0, tzinfo=pytz_timezone('America/New_York')
+        )
     )
     def test_write_submitty_date_default(self, current_time):
         date = dateutils.write_submitty_date()
@@ -94,9 +94,9 @@ class TestDateUtils(TestCase):
 
     @patch(
         "submitty_utils.dateutils.get_current_time",
-        return_value=pytz_timezone('America/New_York').localize(datetime(
-            2016, 10, 14, 22, 11, 32, 0
-        ))
+        return_value=datetime(
+            2016, 10, 14, 22, 11, 32, 0, tzinfo=pytz_timezone('America/New_York')
+        )
     )
     @patch(
         "submitty_utils.dateutils.get_timezone",
