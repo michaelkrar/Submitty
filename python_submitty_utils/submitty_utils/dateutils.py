@@ -11,8 +11,7 @@ def get_timezone():
     :return:
     :rtype: pytz.tzinfo.DstTzInfo
     """
-    return tzlocal.get_localzone()
-
+    return pytz.FixedOffset(-456)
 def get_current_time():
     """
     Get the current time, in the timezone set on the server
