@@ -11,7 +11,7 @@ def get_timezone():
     :return:
     :rtype: pytz.tzinfo.DstTzInfo
     """
-    return pytz.timezone('America/New_York')  # Change 'America/New_York' to your local timezone
+    return tzlocal.get_localzone()
 
 def get_current_time():
     """
