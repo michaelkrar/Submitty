@@ -39,7 +39,7 @@ def write_submitty_date(d=None, milliseconds=False):
         d = d.replace(tzinfo=get_timezone())
 
     if milliseconds:
-        mlsec = d.strftime("%f")[0:3]
+        mlsec = d.strftime("%f")[:3]  # Use the first three digits of milliseconds
         answer = d.strftime(f"%Y-%m-%d %H:%M:%S.{mlsec}%z")
     else:
         answer = d.strftime("%Y-%m-%d %H:%M:%S%z")
