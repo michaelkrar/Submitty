@@ -36,7 +36,6 @@ def get_timezone():
     # Modify this based on your actual daylight saving time rules
     # (dst_offset, dst_start, dst_end)
     return DstTzInfo(tzlocal.get_localzone(), 60, datetime(1, 4, 1), datetime(1, 10, 31))
-
 def get_current_time():
     """
     Get the current time, in the timezone set on the server
@@ -68,6 +67,38 @@ def write_submitty_date(d=None, milliseconds=False):
     else:
         answer = d.strftime("%Y-%m-%d %H:%M:%S%z")
     return answer
+
+def read_submitty_date(s):
+    """
+    Convert a string (with a timezone) to a date time object with a timezone
+    :param s:
+    :return:
+
+    FIXME: We should not be raising a SystemExit within a utility function
+    """
+    words = s.split()
+    if len(words) < 2 or len(words) > 3:
+        raise SystemExit("ERROR: unexpected date format %s" % s)
+    thedatetime = str(words[0] + ' ' + words[1])
+    try:
+        # hoping to find timezone -0400
+        with_timezone = datetime.strptime(thedatetime, '%Y-%m-%d %H:%M:%S%z')
+    except ValueError:
+        try:
+            # hoping to find no timezone
+            without_timezone = datetime.strptime(thedatetime, '%Y-%m-%d %H:%M:%S')
+            my_timezone = get_timezone()
+            with_timezone = without_timezone.replace(tzinfo=my_timezone)
+        except ValueError:
+            try:
+                # hoping to find timezone -04
+                thedatetime = thedatetime+"00"
+                print("dateutils read_submitty_date -- added '00' to ", thedatetime)
+                with_timezone = datetime.strptime(thedatetime, '%Y-%m-%d %H:%M:%S%z')
+            except ValueError:
+                print("DATE PROBLEM", s)
+                raise SystemExit("ERROR:  invalid date format %s" % s)
+    return with_timezone
 
 def parse_datetime(date_string):
     """
@@ -149,16 +180,16 @@ def parse_datetime(date_string):
         ) + timedelta(days=days)
 
     raise ValueError("Invalid string for date parsing: " + str(date_string))
-    
+
 def get_current_semester() -> str:
     """
-    Given today's date, generates a three-character code that represents the semester to use for
+    Given today's date, generates a three character code that represents the semester to use for
     courses such that the first half of the year is considered "Spring" and the last half is
     considered "Fall". The "Spring" semester  gets an S as the first letter while "Fall" gets an
     F. The next two characters are the last two digits in the current year.
     """
-    today = get_current_time()
-    semester = "F" + str(today.year)[-2:]
+    today = datetime.today()
+    semester = "f" + str(today.year)[-2:]
     if today.month < 7:
-        semester = "S" + str(today.year)[-2:]
+        semester = "s" + str(today.year)[-2:]
     return semester
