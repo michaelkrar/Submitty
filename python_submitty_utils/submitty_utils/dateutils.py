@@ -3,27 +3,6 @@ import pytz
 import re
 import tzlocal
 
-class DstTzInfo(pytz.tzinfo.BaseTzInfo):
-    """
-    Custom class to represent a time zone with daylight saving time transitions.
-    """
-    def __init__(self, zone, dst_offset, dst_start, dst_end):
-        self._zone = zone
-        self._dst_offset = timedelta(minutes=dst_offset)
-        self._dst_start = dst_start
-        self._dst_end = dst_end
-
-    def utcoffset(self, dt):
-        return self._dst_offset + self._zone.utcoffset(dt)
-
-    def tzname(self, dt):
-        return self._zone.tzname(dt)
-
-    def dst(self, dt):
-        if self._dst_start <= dt.replace(tzinfo=None) < self._dst_end:
-            return self._dst_offset
-        else:
-            return timedelta(0)
 
 def get_timezone():
     """
@@ -31,11 +10,11 @@ def get_timezone():
     further information on what timezone we should be using
 
     :return:
-    :rtype: DstTzInfo
+    :rtype: pytz.tzinfo.DstTzInfo
     """
-    # Modify this based on your actual daylight saving time rules
-    # (dst_offset, dst_start, dst_end)
-    return DstTzInfo(tzlocal.get_localzone(), 60, datetime(1, 4, 1), datetime(1, 10, 31))
+    # noinspection PyUnresolvedReferences
+    return tzlocal.get_localzone()
+
 def get_current_time():
     """
     Get the current time, in the timezone set on the server
@@ -62,7 +41,7 @@ def write_submitty_date(d=None, milliseconds=False):
         d = d.replace(tzinfo=get_timezone())
 
     if milliseconds:
-        mlsec = d.strftime("%f")[:3]  # Use the first three digits of milliseconds
+        mlsec = d.strftime("%f")[0:3] 
         answer = d.strftime(f"%Y-%m-%d %H:%M:%S.{mlsec}%z")
     else:
         answer = d.strftime("%Y-%m-%d %H:%M:%S%z")
